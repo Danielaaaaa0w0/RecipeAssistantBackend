@@ -20,7 +20,7 @@ class Neo4jService:
 
     def get_recommended_recipes(self, recipe_name_query, category_query, mood_query):
         """
-        根據菜名、分類、心情查詢推薦食譜列表 (聯集邏輯 - 最終修正版)。
+        根據菜名、分類、心情查詢推薦食譜列表 (聯集邏輯)。
         如果所有條件為空，則返回所有食譜。
         """
         params = {
@@ -29,7 +29,7 @@ class Neo4jService:
             "moodQuery": mood_query if mood_query else ""
         }
 
-        # --- 修正後的 Cypher 查詢 (移除了行內註解) ---
+        # --- 修正後的 Cypher 查詢 (移除了行內註解和錯誤的 WITH 子句) ---
         query = (
             "MATCH (r:Recipe) "
             "OPTIONAL MATCH (r)-[:BELONGS_TO_CATEGORY]->(c:Category) "
@@ -45,22 +45,21 @@ class Neo4jService:
             "        OR ($categoryQuery <> '' AND $categoryQuery IN recipeCategories) "
             "        OR ($moodQuery <> '' AND $moodQuery IN recipeMoods) "
             "    ) "
-            "RETURN r.name AS recipeName, "
+            "RETURN DISTINCT r.name AS recipeName, "
             "       r.description_for_recommendation AS recommendationDescription, "
             "       r.difficulty_stars AS difficultyStars, "
-            "       r.image_url AS imageUrl, "
             "       recipeMoods AS moods, "
             "       recipeCategories AS categories "
             "ORDER BY r.name "
             "LIMIT 20"
         )
-        # -----------------------------------------------
-        print(f"Executing FINAL UNION recommendation query with params: {params}")
+        print(f"Executing UNION recommendation query with params: {params}")
         results = self._execute_query(query, params)
         print(f"Query results count: {len(results)}")
         return results
 
     def get_recipe_details(self, recipe_name):
+        # 這是您提供的版本，保持不變
         params = {"recipeName": recipe_name}
         query = (
             "MATCH (r:Recipe {name: $recipeName}) "
@@ -77,6 +76,7 @@ class Neo4jService:
         return result[0] if result else None
 
     def get_recipe_steps(self, recipe_name):
+        # 這是您提供的版本，保持不變
         params = {"recipeName": recipe_name}
         query = (
             "MATCH (r:Recipe {name: $recipeName})-[:FIRST_STEP]->(first_step:Step) "
