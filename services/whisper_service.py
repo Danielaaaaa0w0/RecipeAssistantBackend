@@ -7,8 +7,8 @@ import os       # 如果未來需要讀取臨時檔案的話 (目前不需要)
 
 # 實驗室 Whisper API 的固定參數
 LAB_WHISPER_API_URL = "http://140.116.245.149:5002/proxy"
-API_TOKEN = "2025@test@asr"
-API_LANG = "TA and ZH Medical V1"
+API_TOKEN = "2025@college@asr" # <--- 更新 Token
+API_LANG = "special topic"   # <--- 更新 Lang
 
 print(f"Whisper Service: Configured to use Lab Whisper API at {LAB_WHISPER_API_URL}")
 
